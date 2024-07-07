@@ -1,5 +1,8 @@
 ## Ecommerce Order Processing Demo with Rabbitmq and Go
 
+> [!NOTE]  
+> Services are for demo purpose, it's not feature complete. Goal is to show how to use rabbitmq with go and create a microservices architecture.
+
 This repository contains 4 services that process an ecommerce order and a shared pkg for rabbitmq:
 1. Order
 2. Payment
