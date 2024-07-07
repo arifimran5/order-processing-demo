@@ -1,10 +1,20 @@
 ## Ecommerce Order Processing Demo with Rabbitmq and Go
 
-This repository contains 4 services that process an ecommerce order:
+This repository contains 4 services that process an ecommerce order and a shared pkg for rabbitmq:
 1. Order
 2. Payment
 3. Inventory
 4. Email
+
+### A shared package for rabbitmq utility functions
+- Creating connection
+- Declaring exchanges
+- Declaring queues
+- Binding queues to exchanges
+- Publishing messages to exchanges
+- Consuming messages from queues
+- Setting up dead-letter queues
+
 
 ### Prerequisites
 1. Rabbitmq server
