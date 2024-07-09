@@ -1,8 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	pb "github.com/arifimran5/order-processing-demo/cmd/inventory/inventory"
 	"github.com/arifimran5/order-processing-demo/pkg/shared/rabbitmq"
+	"google.golang.org/grpc"
+	"log"
+	"net"
 	"time"
 )
 
@@ -13,6 +18,8 @@ var (
 )
 
 func main() {
+	go runInventoryService()
+
 	rq, err := rabbitmq.New("amqp://admin:admin@localhost:5672")
 	if err != nil {
 		fmt.Println("failed to connect to rabbitmq", err)
@@ -58,4 +65,44 @@ func main() {
 
 	fmt.Println("Waiting for messages. To exit press CTRL+C")
 	<-forever
+}
+
+type server struct {
+	pb.UnimplementedInventoryServiceServer
+}
+
+func (s *server) CheckInventory(ctx context.Context, req *pb.InventoryRequest) (*pb.InventoryResponse, error) {
+	response := &pb.InventoryResponse{}
+
+	for _, item := range req.Items {
+		// check you database
+
+		isAvailable := false
+		var availableQuantity int32 = item.Quantity + 100
+
+		if item.Quantity <= availableQuantity {
+			isAvailable = true
+		}
+
+		availability := &pb.ItemAvailability{
+			ProductId:         item.ProductId,
+			IsAvailable:       isAvailable,
+			AvailableQuantity: availableQuantity,
+		}
+		response.Availabilities = append(response.Availabilities, availability)
+	}
+	return response, nil
+}
+
+func runInventoryService() {
+	lis, err := net.Listen("tcp", ":50051")
+	if err != nil {
+		log.Fatalf("failed to listen %v\n", err)
+	}
+	s := grpc.NewServer()
+	pb.RegisterInventoryServiceServer(s, &server{})
+	log.Printf("grpc server listening on %v\n", lis.Addr())
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %v\n", err)
+	}
 }

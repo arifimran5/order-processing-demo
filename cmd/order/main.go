@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/arifimran5/order-processing-demo/pkg/shared/rabbitmq"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"math/rand"
+	"log"
 )
 
 var (
@@ -32,12 +32,27 @@ func main() {
 		panic(err)
 	}
 
+	// Before creating order - let's check the inventory
+	productIDs := []string{"Nike Air Jordan", "Fidget Spinner XYZ", "Hand Gloves"}
+	quantities := []int32{5, 3, 120}
+
+	res, err := CheckInventory(productIDs, quantities)
+	if err != nil {
+		log.Fatalf("failed to check inventory %v", err)
+	}
+	for _, availability := range res.Availabilities {
+		log.Printf("Product %s: Available: %v, Quantity: %d", availability.ProductId, availability.IsAvailable, availability.AvailableQuantity)
+		if !availability.IsAvailable {
+			log.Printf("Product %s: Unavailable", availability.ProductId)
+			return
+		}
+	}
+
 	fmt.Println("publishing orders....")
-	for i := 0; i < 5; i++ {
-		randomId := rand.Intn(1000) + 1
+	for i := 0; i < len(productIDs); i++ {
 		err = rq.Publish(exchangeName, "payment.init.order", false, false, amqp.Publishing{
 			ContentType: "text/plain",
-			Body:        []byte(fmt.Sprintf("orderid: %d", randomId)),
+			Body:        []byte(fmt.Sprintf("orderid: %v", productIDs[i])),
 		})
 		if err != nil {
 			fmt.Println("failed to publish order", err)

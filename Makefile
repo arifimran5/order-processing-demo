@@ -17,3 +17,6 @@ run-inventory:
 
 run-email:
 	go run ./cmd/email
+
+grpc-inventory:
+	protoc --go_out=. --go-grpc_out=. cmd/inventory/inventory.proto
