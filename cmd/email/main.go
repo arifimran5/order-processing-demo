@@ -9,7 +9,7 @@ import (
 var (
 	exchangeName = "ecommerce_exchange"
 	queueName    = "email_queue"
-	routingKey   = "email.#"
+	routingKey   = "payment.done.#"
 )
 
 func main() {

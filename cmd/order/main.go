@@ -35,9 +35,9 @@ func main() {
 	fmt.Println("publishing orders....")
 	for i := 0; i < 5; i++ {
 		randomId := rand.Intn(1000) + 1
-		err = rq.Publish(exchangeName, "payment.order.created", false, false, amqp.Publishing{
+		err = rq.Publish(exchangeName, "payment.init.order", false, false, amqp.Publishing{
 			ContentType: "text/plain",
-			Body:        []byte(fmt.Sprintf("order created with id: %d", randomId)),
+			Body:        []byte(fmt.Sprintf("orderid: %d", randomId)),
 		})
 		if err != nil {
 			fmt.Println("failed to publish order", err)

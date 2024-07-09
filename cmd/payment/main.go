@@ -10,7 +10,7 @@ import (
 var (
 	exchangeName = "ecommerce_exchange"
 	queueName    = "payment_queue"
-	routingKey   = "payment.#"
+	routingKey   = "payment.init.#"
 )
 
 func main() {
@@ -55,25 +55,25 @@ func main() {
 			fmt.Println("initiating inventory management and email service ...")
 
 			// send message to inventory queue
-			err = rq.Publish(exchangeName, "inventory.update", false, false, amqp.Publishing{
+			err = rq.Publish(exchangeName, "payment.done.inventory", false, false, amqp.Publishing{
 				ContentType: "text/plain",
-				Body:        []byte(fmt.Sprintf("update inventory: %v", string(d.Body))),
+				Body:        []byte(fmt.Sprintf(string(d.Body))),
 			})
 			if err != nil {
 				fmt.Println("Failed to publish inventory update", err)
 			}
 
 			//send message to email queue
-			err = rq.Publish(exchangeName, "email.send", false, false, amqp.Publishing{
-				ContentType: "text/plain",
-				Body:        []byte(fmt.Sprintf("send email: %v", string(d.Body))),
-			})
-			if err != nil {
-				fmt.Println("Failed to publish email", err)
-			}
-			fmt.Println("INITIATED INVENTORY & EMAIL 💥")
-			fmt.Println()
-			fmt.Println()
+			//err = rq.Publish(exchangeName, "payment.done.email", false, false, amqp.Publishing{
+			//	ContentType: "text/plain",
+			//	Body:        []byte(fmt.Sprintf("send email: %v", string(d.Body))),
+			//})
+			//if err != nil {
+			//	fmt.Println("Failed to publish email", err)
+			//}
+			//fmt.Println("INITIATED INVENTORY & EMAIL 💥")
+			//fmt.Println()
+			//fmt.Println()
 		}
 	}()
 	fmt.Println("Waiting for messages. To exit press CTRL+C")
