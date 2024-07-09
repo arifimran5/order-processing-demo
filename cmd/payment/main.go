@@ -54,26 +54,17 @@ func main() {
 
 			fmt.Println("initiating inventory management and email service ...")
 
-			// send message to inventory queue
-			err = rq.Publish(exchangeName, "payment.done.inventory", false, false, amqp.Publishing{
+			// send message to inventory and email
+			err = rq.Publish(exchangeName, "payment.done", false, false, amqp.Publishing{
 				ContentType: "text/plain",
 				Body:        []byte(fmt.Sprintf(string(d.Body))),
 			})
 			if err != nil {
-				fmt.Println("Failed to publish inventory update", err)
+				fmt.Println("Failed to publish update", err)
 			}
-
-			//send message to email queue
-			//err = rq.Publish(exchangeName, "payment.done.email", false, false, amqp.Publishing{
-			//	ContentType: "text/plain",
-			//	Body:        []byte(fmt.Sprintf("send email: %v", string(d.Body))),
-			//})
-			//if err != nil {
-			//	fmt.Println("Failed to publish email", err)
-			//}
-			//fmt.Println("INITIATED INVENTORY & EMAIL 💥")
-			//fmt.Println()
-			//fmt.Println()
+			fmt.Println("INITIATED INVENTORY & EMAIL 💥")
+			fmt.Println()
+			fmt.Println()
 		}
 	}()
 	fmt.Println("Waiting for messages. To exit press CTRL+C")
