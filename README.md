@@ -39,7 +39,7 @@ Or run services individually by calling `go run cmd/order/main.go` etc.
 ```bash
 make grpc-inventory
 # or
-protoc --go_out=. --go-grpc_out=. cmd/inventory/inventory.proto
+protoc --go_out=cmd/inventory --go-grpc_out=cmd/inventory cmd/inventory/inventory.proto
 ```
 
 ### Place Order by running - Order service
